@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Hot Restaurant</title>
@@ -9,15 +10,23 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
 </head>
+
 <body>
 
   <div class="container">
     <div class="jumbotron">
-      <h1><span class="glyphicon glyphicon-fire"></span> Hot Restaurant</h1>
+      <h1>
+        <span class="glyphicon glyphicon-fire"></span> Hot Restaurant</h1>
       <h3>Book your seat before they are all gone!</h3>
       <hr>
-      <a href="/reserve"><button type="button" class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-plus"></span> Make Reservation</button></a>
-      <a href="/"><button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-th-list"></span> Home </button></a>
+      <a href="/reserve">
+        <button type="button" class="btn btn-danger btn-lg">
+          <span class="glyphicon glyphicon-plus"></span> Make Reservation</button>
+      </a>
+      <a href="/">
+        <button type="button" class="btn btn-primary btn-lg">
+          <span class="glyphicon glyphicon-th-list"></span> Home </button>
+      </a>
     </div>
     <div class="row">
 
@@ -25,42 +34,24 @@
 
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h3 class="panel-title"><strong>Table Search</strong></h3>
+            <h3 class="panel-title">
+              <strong>Reserved Tables</strong>
+            </h3>
           </div>
           <div class="panel-body">
-            <input type="text" id="table-search" class="form-control" >
-            <br>
-            <div class="text-right">
-              <button type="submit" class="btn btn-primary btn-md" id="search-btn"><span class="glyphicon glyphicon-search"></span> Search</button>
-
+            <div class="well-section" id="reservationList">
             </div>
           </div>
         </div>
 
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h3 class="panel-title"><strong>Reserved Tables</strong></h3>
+            <h3 class="panel-title">
+              <strong>Waiting List</strong>
+            </h3>
           </div>
           <div class="panel-body">
-            <div class="reservationList">
-              <h2 id="name">Ben</h2>
-              <div id="stats">
-                <h3><strong>Party size:</strong> <span id="partysize">5</span></h3>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3 class="panel-title"><strong>Waitlist</strong></h3>
-          </div>
-          <div class="panel-body">
-            <div class="waitlist">
-              <h2 id="name">Kyle</h2>
-              <div id="stats">
-                <h3><strong>Party size:</strong> <span id="partysize">5</span></h3>
-              </div>
+            <div class="well-section" id="waitlist">
             </div>
           </div>
         </div>
@@ -69,29 +60,33 @@
   </div>
 
   <script type="text/javascript">
-    $("#search-btn").on("click", function() {
-      var searchedCharacter = $("#character-search").val().trim();
+    $(document).ready(function () {
 
-      // Using a RegEx Pattern to remove spaces from searchedCharacter
-      // You can read more about RegEx Patterns later https://www.regexbuddy.com/regex.html
-      searchedCharacter = searchedCharacter.replace(/\s+/g, "").toLowerCase();
+      $.get("/api", function (data) {
+        for (var i = 0; i < data.tables.length; i++) {
+          var wellSection = $("<div>");
+          wellSection.addClass("well");
+          wellSection.attr("id", "well-" + i);
+          $("#reservationList").append(wellSection);
 
-      $.get("/api/" + searchedCharacter, function(data) {
-        console.log(data);
-        if (data) {
-          $("#stats").show();
-          $("#name").text(data.name);
-          $("#role").text(data.role);
-          $("#age").text(data.age);
-          $("#force-points").text(data.forcePoints);
+          $("#well-" + i).append("<h2>" + data.tables[i].name + "</h2>");
+          $("#well-" + i).append("<h3>Party of : " + data.tables[i].partyof + "</h4>");
         }
-        else {
-          $("#name").text("The force is not strong with this one. Your character was not found.");
-          $("#stats").hide();
+        for (var i = 0; i < data.waitlist.length; i++) {
+          var wellSection = $("<div>");
+          wellSection.addClass("well");
+          wellSection.attr("id", "well-waitlist-" + i);
+          $("#waitlist").append(wellSection);
+
+          $("#well-waitlist-" + i).append("<h2>" + data.waitlist[i].name + "</h2>");
+          $("#well-waitlist-" + i).append("<h3>Party of : " + data.waitlist[i].partyof + "</h4>");
         }
       });
     });
+
+
   </script>
 
 </body>
+
 </html>
